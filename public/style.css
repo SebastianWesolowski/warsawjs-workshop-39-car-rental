@@ -1,16 +1,16 @@
 body {
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
 }
 
 section {
-  background-color: #EAEAEA;
+  background-color: #eaeaea;
   padding: 0.5em;
   margin: 1em;
   box-sizing: border-box;
-
 }
 
-h1, h2 {
+h1,
+h2 {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
 }

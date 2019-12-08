@@ -2786,6 +2786,11 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+want-type@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/want-type/-/want-type-1.1.0.tgz#2a04d4b750c6311b9a256750411fea0da88c8780"
+  integrity sha512-gAxLJUb+db9YtmaWapRTuSpb+YW/ftW8kPoNis5xyKN/DhgDGZGecxBbkLZLOUp0CQlFUlp6K1iTD6KUwA1ijA==
+
 which@^1.2.14, which@^1.2.9:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/which/-/which-1.3.1.tgz#a45043d54f5805316da8d62f9f50918d3da70b0a"

@@ -1,5 +1,5 @@
-exports.up = function(knex) {
-  return knex.schema.createTable('cars', function(table) {
+exports.up = function (knex) {
+  return knex.schema.createTable('cars', function (table) {
     table.increments('car_id').notNullable().primary();
     table.text('make').notNullable();
     table.text('model').notNullable();
@@ -9,7 +9,7 @@ exports.up = function(knex) {
     table.boolean('rented').notNullable();
     table.integer('rental_id');
     table.text('policy');
-  }).createTable('rentals', function(table) {
+  }).createTable('rentals', function (table) {
     table.increments('rental_id').notNullable().primary();
     table.integer('car_id').notNullable();
     table.timestamp('start').notNullable();
@@ -25,7 +25,7 @@ exports.up = function(knex) {
   );
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema
     .raw('DROP VIEW cars_with_status')
     .dropTable('rentals')

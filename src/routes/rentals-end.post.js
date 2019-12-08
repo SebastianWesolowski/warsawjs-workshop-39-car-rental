@@ -1,6 +1,5 @@
 'use strict';
 
-// const db = require('../db');
 const listPrice = require('../strategies/listPrice');
 
 module.exports = function (app, { db }) {

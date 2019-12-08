@@ -1,24 +1,20 @@
-
 'use strict';
+
 const ValueObject = require('./ValueObject');
+const want = require('want-type');
 
 class DateRange extends ValueObject {
-    /**
-    * create new dateRange
-    * @parem {Object} params
-    * @parem {Date|string} params start
-    * @parem {Date|string} params end
-    */
+  constructor({ start, end }) {
+    start = new Date(start);
+    end = new Date(end);
+    want('start', start, want.Date());
+    want('end', end, want.Date(start));
+    super({ start, end });
+  }
 
-    constructor({ start, end }) {
-        start = new Date(start);
-        end = new Date(end);
-
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            throw new TypeError('start or end is invaild');
-        }
-        super({ start, end });
-    }
+  duration() {
+    return this.end.getTime() - this.start.getTime();
+  }
 }
 
 module.exports = DateRange;

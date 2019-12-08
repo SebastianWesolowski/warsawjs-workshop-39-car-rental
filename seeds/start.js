@@ -2,7 +2,7 @@
 
 const DAY_MS = 60 * 60 * 24 * 1000;
 
-module.exports.seed = async function(knex) {
+module.exports.seed = async function (knex) {
   await knex('cars').del();
   await knex('rentals').del();
   await knex('cars').insert([

@@ -1,17 +1,14 @@
-
 'use strict';
+
 const ValueObject = require('./ValueObject');
+const want = require('want-type');
 
 class Money extends ValueObject {
-    constructor({ amount, currency }) {
-        if (typeof amount !== 'number' || isNaN(amount)) {
-            throw new TypeError('Money.amount must be a Number')
-        }
-        if (typeof currency !== 'string' || currency.length !== 3) {
-            throw new TypeError('Money.currency must be a 3-letter ISO')
-        }
-        super({ amount, currency })
-    }
+  constructor({ amount, currency }) {
+    want('amount', amount, want.Number());
+    want('currency', currency, want.String(3, 3));
+    super({ amount, currency });
+  }
 }
 
 module.exports = Money;

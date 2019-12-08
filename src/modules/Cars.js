@@ -1,35 +1,25 @@
 'use strict';
 
 const Money = require('../types/Money');
-const DateRange = require('../types/DateRange');
-// const listProice = require('../');
+const listPrice = require('../strategies/listPrice');
+
 class Cars {
     constructor({ db }) {
-        this._db = this;
+        this.db = db;
     }
 
-    // get a offer for car
-    // @param {string} carId
-    // @param {dataRange} date
-
-    async getOffer(carID, dataRange) {
-        const db = this._db;
+    async getOffer(carID, dateRange) {
+        const db = this.db;
         const car = await db('cars')
             .first()
             .where({ car_id: carID });
         if (!car) {
             return Promise.reject(new Error('No entry found for car: ' + carID));
         }
-        const { price, days } = listPrice(
-            new Money({ amount: car.list_price_amount, currency: car.list_price_currency }),
-            // new DateRange({ start: DateRange.start, end: DateRange.end }))
-            dataRange
-        );
-
-        return { price, days, car };
+        const basePrice = new Money({ amount: car.list_price_amount, currency: car.list_price_currency });
+        const { price, days } = listPrice(basePrice, dateRange);
+        return { car, price, days };
     }
-
 }
 
-
-module.exports = Cars
+module.exports = Cars;
