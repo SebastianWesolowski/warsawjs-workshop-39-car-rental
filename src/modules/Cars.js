@@ -25,6 +25,15 @@ class Cars {
     return car;
   }
 
+  async startRental(carID, duration) {
+    const mapper = new CarMapper({ db: this._db });
+    const rentals = new RentalMapper({ db: this._db });
+    const car = await cars.find({ ID: carID });
+    car.endRental();
+    await mapper.update(car);
+    return car;
+  }
+
   async endRental(carID) {
     const mapper = new CarMapper({ db: this._db });
     const car = await mapper.find({ ID: carID });
