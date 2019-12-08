@@ -1,11 +1,10 @@
 'use strict';
 
+const db = require('../db');
 const DAY_MS = 60 * 60 * 24 * 1000;
 const listPrice = require('../strategies/listPrice');
-const DateRange = require('../types/DateRange');
-const Money = require('../types/Money');
 
-module.exports = function (app, { db }) {
+module.exports = function (app) {
   app.get('/price', {
     schema: {
       query: {
@@ -18,19 +17,19 @@ module.exports = function (app, { db }) {
     }
   }, async function (request, reply) {
     const car_id = request.query.car_id;
-    const dateRange = new DateRange({ start: request.query.date_start, end: request.query.date_end });
+    const start = new Date(request.query.date_start);
+    const end = new Date(request.query.date_end);
     const car = await db('cars')
       .first()
       .where({ car_id: car_id });
     if (!car) {
       return Promise.reject(new Error('No entry found for car: ' + car_id));
     }
-    const basePrice = new Money({ amount: car.list_price_amount, currency: car.list_price_currency });
-    const { price, days } = listPrice(basePrice, dateRange);
+    const { price, days } = listPrice(car.list_price_amount, car.list_price_currency, start, end);
     reply.view('price', {
       car,
       price,
-      rental: { start: dateRange.start, end: dateRange.end, days },
+      rental: { start, end, days },
       timestamp: new Date()
     });
   });

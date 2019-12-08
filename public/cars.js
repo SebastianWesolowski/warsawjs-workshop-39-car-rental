@@ -14,7 +14,7 @@
       </div>`;
       element = document.importNode(template.content, true).children[0];
       element.querySelector('h1').textContent = title;
-      element.querySelector('.close').addEventListener('click', function (event) {
+      element.querySelector('.close').addEventListener('click', function(event) {
         closeOverlay();
         event.preventDefault();
       });
@@ -41,14 +41,14 @@
   }
 
   for (let form of document.querySelectorAll('form.end_rental')) {
-    form.addEventListener('submit', function (event) {
+    form.addEventListener('submit', function(event) {
       if (!window.confirm('Are you sure you want to end the rental?')) {
         event.preventDefault();
       }
     });
   }
   for (let form of document.querySelectorAll('form.start_rental')) {
-    form.addEventListener('submit', function (event) {
+    form.addEventListener('submit', function(event) {
       event.preventDefault();
       const carData = new FormData(event.target);
       const car_id = carData.get('car_id');
