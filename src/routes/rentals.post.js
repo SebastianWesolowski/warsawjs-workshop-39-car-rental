@@ -1,7 +1,8 @@
 'use strict';
 
-// const db = require('../db');
 const listPrice = require('../strategies/listPrice');
+const DateRange = require('../types/DateRange');
+const Money = require('../types/Money');
 
 module.exports = function (app, { db }) {
   app.post('/rentals', {
@@ -24,8 +25,7 @@ module.exports = function (app, { db }) {
     const car_id = request.body.car_id;
     // For sake of exercise's simplicity, we start the rental at this moment.
     // Otherwise, we'd have to deal with a separate pick-up operation.
-    const start = new Date(request.body.date_start);
-    const end = new Date(request.body.date_end);
+    const dateRange = new DateRange({ start: request.body.date_start, end: request.body.date_end });
     const { car, price, days } = await db.transaction(async function (transaction) {
       const car = await transaction('cars')
         .first()
@@ -36,18 +36,14 @@ module.exports = function (app, { db }) {
       if (car.rented) {
         throw new Error('This car is already rented');
       }
-
-      const { price, days } = listPrice(
-        new Money({ amount: car.list_price_amount, curency: car.list_price_currency }),
-        new DateRange({ start, end })
-      );
-
+      const basePrice = new Money({ amount: car.list_price_amount, currency: car.list_price_currency });
+      const { price, days } = listPrice(basePrice, dateRange);
       // Actually save the rental contract and mark the car as taken:
       const [rental_id] = await transaction('rentals')
         .insert({
           car_id: car_id,
-          start: start,
-          end: end,
+          start: dateRange.start,
+          end: dateRange.end,
           active: true,
           price_amount: price.amount,
           price_currency: price.currency
@@ -60,7 +56,7 @@ module.exports = function (app, { db }) {
     reply.view('rental-started', {
       car,
       price,
-      rental: { start, end, days },
+      rental: { start: dateRange.start, end: dateRange.end, days },
       timestamp: new Date()
     });
   });
