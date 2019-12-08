@@ -1,9 +1,12 @@
 'use strict';
 
-const db = require('../db');
 const listPrice = require('../strategies/listPrice');
+const DateRange = require('../types/DateRange');
+const Money = require('../types/Money');
+const Cars = require('../modules/Cars');
+const Rentals = require('../modules/Rentals');
 
-module.exports = function(app) {
+module.exports = function(app, { db }) {
   app.post('/rentals', {
     schema: {
       body: {
@@ -24,38 +27,21 @@ module.exports = function(app) {
     const car_id = request.body.car_id;
     // For sake of exercise's simplicity, we start the rental at this moment.
     // Otherwise, we'd have to deal with a separate pick-up operation.
-    const start = new Date(request.body.date_start);
-    const end = new Date(request.body.date_end);
+    const dateRange = new DateRange({ start: request.body.date_start, end: request.body.date_end });
     const { car, price, days } = await db.transaction(async function(transaction) {
-      const car = await transaction('cars')
-        .first()
-        .where({ car_id: car_id }).forUpdate();
-      if (!car) {
-        throw new Error('No entry found for car: ' + car_id);
-      }
-      if (car.rented) {
-        throw new Error('This car is already rented');
-      }
-      const { price, days } = listPrice(car.list_price_amount, car.list_price_currency, start, end);
+      const cars = new Cars({ db: transaction });
+      const rentals = new Rentals({ db: transaction });
+      const offer = await cars.getOffer(car_id, dateRange);
       // Actually save the rental contract and mark the car as taken:
-      const [ rental_id ] = await transaction('rentals')
-        .insert({
-          car_id: car_id,
-          start: start,
-          end: end,
-          active: true,
-          price_amount: price.amount,
-          price_currency: price.currency
-        }, [ 'rental_id' ]);
-      await transaction('cars')
-        .update({ rented: true, rental_id: rental_id })
-        .where({ car_id: car_id });
-      return { car, price, days };
+      const rental = await rentals.start(car_id, dateRange, offer.price);
+      const rental_id = rental.getID();
+      const car = await cars.rent(car_id, rental_id, { age: request.body.customer_age });
+      return { car, price: offer.price, days: offer.days };
     });
     reply.view('rental-started', {
       car,
       price,
-      rental: { start, end, days },
+      rental: { start: dateRange.start, end: dateRange.end, days },
       timestamp: new Date()
     });
   });

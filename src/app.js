@@ -1,5 +1,6 @@
 'use strict';
 
+// libraries:
 const fastify = require('fastify');
 const helmet = require('fastify-helmet');
 const formbody = require('fastify-formbody');
@@ -7,8 +8,14 @@ const pov = require('point-of-view');
 const ejs = require('ejs');
 const staticPlugin = require('fastify-static');
 const path = require('path');
+// application dependencies:
 const routes = require('./routes');
+const db = require('./db');
+// logic:
+const Cars = require('./modules/Cars');
+const cars = new Cars({ db });
 
+// init:
 const app = fastify({
   logger: true
 });
@@ -35,7 +42,7 @@ app.register(staticPlugin, {
 
 // The routes are actually route-registering functions. Call each of them:
 for (let installRoute of routes) {
-  installRoute(app);
+  installRoute(app, { db, cars });
 }
 
 module.exports = app;
