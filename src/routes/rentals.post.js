@@ -1,9 +1,9 @@
 'use strict';
 
-const db = require('../db');
+// const db = require('../db');
 const listPrice = require('../strategies/listPrice');
 
-module.exports = function (app) {
+module.exports = function (app, { db }) {
   app.post('/rentals', {
     schema: {
       body: {
